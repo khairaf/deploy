@@ -9,7 +9,6 @@ export default function Dialog() {
     dialog: { data, url },
     setDialog,
     setSavedPokemons,
-    savedPokemons,
   } = useContext(PokemonContext);
 
   const [selectedAlias, setSelectedAlias] = useState()
@@ -27,8 +26,8 @@ export default function Dialog() {
 
   const handleAlias = (e) => {
     e.preventDefault();
-    setSavedPokemons([
-      ...savedPokemons,
+    setSavedPokemons(prev => [
+      ...prev,
       {
         url,
         alias: selectedAlias,

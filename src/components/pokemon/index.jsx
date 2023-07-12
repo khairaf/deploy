@@ -50,7 +50,7 @@ export default function Pokemon({ url, alias }) {
   const handleSavePokemon = () => {
     if (location.pathname === '/deploy/saved') {
       // Delete saved pokemon
-      setSavedPokemons(savedPokemons.filter(p => p.url !== url))
+      setSavedPokemons(prev => prev.filter(p => p.url !== url))
     } else {
       setDialog({
         isOpen: true,
