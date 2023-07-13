@@ -74,7 +74,9 @@ export default function Root() {
           const abilities = await response.json();
 
           const promises = abilities.results.map(async ({ url }) => {
-            const res = await fetch(url);
+            const res = await fetch(url, {
+              signal: abortController.signal,
+            });
             const data = await res.json();
 
             return data;
