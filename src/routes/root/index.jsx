@@ -120,7 +120,7 @@ export default function Root() {
       );
       if (response.ok) {
         const data = await response.json();
-        setPokemons(data);
+        setPokemons([data]);
         // important
         setError(null);
       } else {
@@ -141,7 +141,7 @@ export default function Root() {
 
   const handleName = async (e) => {
     e.preventDefault();
-    if (!selectedName) return null
+    if (!selectedName) return null;
     try {
       setSelectedType("");
       setPokemons(null);
@@ -151,7 +151,28 @@ export default function Root() {
       );
       if (response.ok) {
         const data = await response.json();
-        setPokemons(data);
+        // Manipulate data
+        if (data?.id) {
+          const newData = [
+            {
+              pokemon: [
+                {
+                  pokemon: {
+                    // Only this particular api can have data.id in its structure
+                    id: data.id,
+                    name: data.name,
+                    url: data.species?.url,
+                    front_default: data.sprites?.front_default,
+                    height: data.height,
+                    weight: data.weight,
+                    types: data.types?.map((t) => t.type?.name).join(", "),
+                  },
+                },
+              ],
+            },
+          ];
+          setPokemons(newData);
+        }
         // important
         setError(null);
       } else {
@@ -229,34 +250,24 @@ export default function Root() {
               </tr>
             </thead>
 
-            {selectedName !== "" && (
-              <tbody>
-                {pokemons?.species?.url ? (
-                  <tr>
-                    <td>{pokemons?.id}</td>
-                    <td>{pokemons?.species?.name}</td>
-                    <td>
-                      <Img imgSrc={pokemons?.sprites?.front_default} />
-                    </td>
-                    <td>{pokemons?.height}</td>
-                    <td>{pokemons?.weight}</td>
-                    <td>
-                      {pokemons?.types?.map((t) => t.type.name).join(", ")}
-                    </td>
-                  </tr>
-                ) : (
-                  <tr>
-                    <td>Not Found</td>
-                  </tr>
-                )}
-              </tbody>
-            )}
-
-            {selectedType !== "" && (
-              <tbody>
-                {pokemons?.pokemon &&
-                  Array.isArray(pokemons.pokemon) &&
-                  pokemons.pokemon.map((poke) => {
+            <tbody>
+              {Array.isArray(pokemons) &&
+                pokemons.map((p) =>
+                  p.pokemon?.map((poke) => {
+                    if (poke?.pokemon?.id) {
+                      return (
+                        <tr key={poke.pokemon.id}>
+                          <td>{poke.pokemon.id}</td>
+                          <td>{poke.pokemon.name}</td>
+                          <td>
+                            <Img imgSrc={poke.pokemon.front_default} />
+                          </td>
+                          <td>{poke.pokemon.height}</td>
+                          <td>{poke.pokemon.weight}</td>
+                          <td>{poke.pokemon.types}</td>
+                        </tr>
+                      );
+                    }
                     if (poke?.pokemon?.url) {
                       return (
                         <PokemonRow
@@ -266,25 +277,14 @@ export default function Root() {
                       );
                     }
                     return null;
-                  })}
-              </tbody>
-            )}
-            {selectedType === "" && (
+                  })
+                )}
+            </tbody>
+            {!!error && (
               <tbody>
-                {Array.isArray(pokemons) &&
-                  pokemons.map((p) =>
-                    p.pokemon?.map((poke) => {
-                      if (poke?.pokemon?.url) {
-                        return (
-                          <PokemonRow
-                            key={poke.pokemon.name}
-                            url={poke.pokemon.url}
-                          />
-                        );
-                      }
-                      return null;
-                    })
-                  )}
+                <tr>
+                  <td>Not Found</td>
+                </tr>
               </tbody>
             )}
           </table>
