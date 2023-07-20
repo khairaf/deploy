@@ -191,7 +191,7 @@ export default function Root() {
     <>
       <div>
         <h1>List</h1>
-        <p>Error name: {error ? JSON.stringify(error) : "no error"}</p>
+        {!!error && <p>{error.message ? error.message: 'Something went wrong'}</p>}
         <Link to={"saved"}>Go to Saved Pokemon Page</Link>
         <div className="filter">
           {isTypesLoading ? (
